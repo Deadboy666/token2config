@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -eu
+
+manifest_dir=$HOME/.local/share/ACCELA/morrenus_manifests
+slssteam_config=$HOME/.config/SLSsteam/
+
+    checkforapptoken(){
+        cd $manifest_dir/
+        read -p "Enter Appid:" appid
+        unzip accela_fetch_$appid.zip $appid.lua &> /dev/null
+        apptoken=$(sed -n 's/.*addtoken([^,]*, *\"\([^"]*\)\".*/\1/p' "$appid.lua")
+        echo "  $appid: $apptoken"
+        }
+    importtoken2config(){
+        checkforapptoken
+        cd $slssteam_config/
+        appid="$appid"
+        apptoken="$apptoken"
+        sed -i "/AppTokens:/a\\  $appid: $apptoken" config.yaml
+        rm $manifest_dir/$appid.lua
+        echo "Added Token To Config.."
+        }
+        importtoken2config
+
